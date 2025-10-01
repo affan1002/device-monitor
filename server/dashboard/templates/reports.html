@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Device Monitor{% endblock %}
+
+{% block content %}
+<div class="reports-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>📋 Reports</h1>
+        <p>Generate and view device usage reports</p>
+    </div>
+
+    <!-- Report Generation -->
+    <div class="report-generator">
+        <h3>Generate New Report</h3>
+        <div class="report-form">
+            <div class="form-group">
+                <label for="report-type">Report Type:</label>
+                <select id="report-type" class="form-control">
+                    <option value="usage">Usage Summary</option>
+                    <option value="uptime">Uptime Report</option>
+                    <option value="events">Events Report</option>
+                    <option value="performance">Performance Report</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="date-range">Date Range:</label>
+                <select id="date-range" class="form-control">
+                    <option value="today">Today</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+        </div>
+    </div>
+
+    <!-- Report Display -->
+    <div class="report-display" id="report-display">
+        <div class="empty-state">
+            <p>📊 Select options and click "Generate Report" to view analytics</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+        <h3>Quick Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Uptime</h4>
+                <p class="stat-value" id="total-uptime">Calculating...</p>
+            </div>
+            <div class="stat-card">
+                <h4>Avg Session Duration</h4>
+                <p class="stat-value" id="avg-session">Calculating...</p>
+            </div>
+            <div class="stat-card">
+                <h4>Most Active Device</h4>
+                <p class="stat-value" id="most-active">Calculating...</p>
+            </div>
+            <div class="stat-card">
+                <h4>Total Power Events</h4>
+                <p class="stat-value" id="power-events">Calculating...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Device Monitor{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>📊 Dashboard</h1>
+        <p>Monitor your devices in real-time</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🖥️</div>
+            <div class="stat-content">
+                <h3>Total Devices</h3>
+                <p class="stat-value" id="total-devices">Loading...</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <h3>Active Devices</h3>
+                <p class="stat-value" id="active-devices">Loading...</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-content">
+                <h3>Total Events</h3>
+                <p class="stat-value" id="total-events">Loading...</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">💻</div>
+            <div class="stat-content">
+                <h3>Avg CPU Usage</h3>
+                <p class="stat-value" id="avg-cpu">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- CPU Usage Chart -->
+        <div class="chart-card">
+            <h3>📈 CPU Usage</h3>
+            <canvas id="cpuChart"></canvas>
+        </div>
+
+        <!-- Memory Usage Chart -->
+        <div class="chart-card">
+            <h3>💾 Memory Usage</h3>
+            <canvas id="memoryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Devices Table -->
+    <div class="table-card">
+        <h3>🖥️ Recent Devices</h3>
+        <div class="table-responsive">
+            <table class="data-table" id="devices-table">
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Hostname</th>
+                        <th>Platform</th>
+                        <th>Status</th>
+                        <th>Last Seen</th>
+                    </tr>
+                </thead>
+                <tbody id="devices-tbody">
+                    <tr>
+                        <td colspan="5" class="text-center">Loading devices...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
