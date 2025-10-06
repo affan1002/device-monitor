@@ -26,6 +26,7 @@ def create_app():
     app.config['SECRET_KEY'] = config.SECRET_KEY
     app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
     
     # Initialize extensions
     db.init_app(app)
@@ -49,6 +50,11 @@ def create_app():
     def devices():
         """Devices management page"""
         return render_template('devices.html')
+    
+    @app.route('/devices/<device_id>')
+    def device_details(device_id):
+        """Device details page"""
+        return render_template('device_details.html', device_id=device_id)
     
     @app.route('/reports')
     def reports():

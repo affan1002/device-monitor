@@ -33,9 +33,9 @@ class Device(db.Model):
             'hostname': self.hostname,
             'platform': self.platform,
             'platform_version': self.platform_version,
-            'last_seen': self.last_seen.isoformat() if self.last_seen else None,
+            'last_seen': self.last_seen.isoformat() + 'Z' if self.last_seen else None,
             'is_active': self.is_active,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None
         }
 
 class PowerEvent(db.Model):
@@ -55,9 +55,9 @@ class PowerEvent(db.Model):
             'id': self.id,
             'device_id': self.device_id,
             'event_type': self.event_type,
-            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'timestamp': self.timestamp.isoformat() + 'Z' if self.timestamp else None,
             'details': self.details,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None
         }
 
 class SystemStat(db.Model):
@@ -78,12 +78,12 @@ class SystemStat(db.Model):
         return {
             'id': self.id,
             'device_id': self.device_id,
-            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'timestamp': self.timestamp.isoformat() + 'Z' if self.timestamp else None,
             'cpu_percent': self.cpu_percent,
             'memory_percent': self.memory_percent,
             'disk_percent': self.disk_percent,
             'uptime': self.uptime,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None
         }
 
 class SessionEvent(db.Model):
@@ -105,9 +105,9 @@ class SessionEvent(db.Model):
             'id': self.id,
             'device_id': self.device_id,
             'session_type': self.session_type,
-            'start_time': self.start_time.isoformat() if self.start_time else None,
-            'end_time': self.end_time.isoformat() if self.end_time else None,
+            'start_time': self.start_time.isoformat() + 'Z' if self.start_time else None,
+            'end_time': self.end_time.isoformat() + 'Z' if self.end_time else None,
             'duration': self.duration,
             'username': self.username,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None
         }

@@ -18,6 +18,8 @@ from agent.monitors.power_monitor import PowerMonitor
 from agent.monitors.system_monitor import SystemMonitor
 from agent.database.local_db import LocalDatabase
 from agent.utils.logger import setup_logger
+from agent.sync.server_sync import ServerSync
+import schedule
 
 class DeviceMonitorAgent:
     def __init__(self):
@@ -26,6 +28,12 @@ class DeviceMonitorAgent:
         self.db = LocalDatabase()
         self.power_monitor = PowerMonitor(self.db, self.logger)
         self.system_monitor = SystemMonitor(self.db, self.logger)
+        self.server_sync = ServerSync(
+            database=self.db,
+            server_url=f"http://{self.settings.SERVER_HOST}:{self.settings.SERVER_PORT}",
+            api_key=self.settings.API_KEY,
+            device_id=self.settings.AGENT_ID
+        )
         self.running = False
         
     def start(self):
@@ -38,11 +46,19 @@ class DeviceMonitorAgent:
         signal.signal(signal.SIGTERM, self._signal_handler)
         
         try:
+            # Test server connection
+            if self.server_sync.test_connection():
+                self.server_sync.register_device()
+            
             self.power_monitor.start()
             self.system_monitor.start()
             
+            # Schedule sync every 5 minutes
+            schedule.every(5).minutes.do(self.server_sync.sync_all)
+            
             # Main loop
             while self.running:
+                schedule.run_pending()
                 time.sleep(1)
                 
         except Exception as e:

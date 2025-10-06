@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Device Details - Device Monitor{% endblock %}
+
+{% block content %}
+<div class="device-details-page">
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state">
+        <p>Loading device details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-state" style="display: none;">
+        <h2>❌ Device Not Found</h2>
+        <p>The requested device could not be found.</p>
+        <a href="/devices" class="btn btn-primary">← Back to Devices</a>
+    </div>
+
+    <!-- Device Details Content -->
+    <div id="device-content" style="display: none;">
+        <!-- Back Button and Header -->
+        <div class="page-header">
+            <div class="header-actions">
+                <a href="/devices" class="btn btn-secondary">← Back to Devices</a>
+            </div>
+            <div class="device-title">
+                <h1 id="device-hostname">Device Name</h1>
+                <span id="device-status-badge" class="badge">Status</span>
+            </div>
+        </div>
+
+        <!-- Device Info Cards -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>📋 Basic Information</h3>
+                <div class="info-row">
+                    <span class="info-label">Device ID:</span>
+                    <span class="info-value" id="device-id">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Hostname:</span>
+                    <span class="info-value" id="hostname">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Platform:</span>
+                    <span class="info-value" id="platform">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Platform Version:</span>
+                    <span class="info-value" id="platform-version">-</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>⏰ Timing Information</h3>
+                <div class="info-row">
+                    <span class="info-label">Last Seen:</span>
+                    <span class="info-value" id="last-seen">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Registered:</span>
+                    <span class="info-value" id="registered">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Current Uptime:</span>
+                    <span class="info-value" id="uptime">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value" id="is-active">-</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>💻 Current Stats</h3>
+                <div class="info-row">
+                    <span class="info-label">CPU Usage:</span>
+                    <span class="info-value" id="current-cpu">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Memory Usage:</span>
+                    <span class="info-value" id="current-memory">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Disk Usage:</span>
+                    <span class="info-value" id="current-disk">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Last Updated:</span>
+                    <span class="info-value" id="stats-timestamp">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="charts-section">
+            <h2>📈 Performance History</h2>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>CPU Usage Over Time</h3>
+                    <canvas id="device-cpu-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Memory Usage Over Time</h3>
+                    <canvas id="device-memory-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Disk Usage Over Time</h3>
+                    <canvas id="device-disk-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Power Events -->
+        <div class="events-section">
+            <h2>⚡ Recent Power Events</h2>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Event Type</th>
+                            <th>Timestamp</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-tbody">
+                        <tr>
+                            <td colspan="3" class="text-center">Loading events...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- System Statistics History -->
+        <div class="stats-section">
+            <h2>📊 System Statistics History</h2>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>CPU %</th>
+                            <th>Memory %</th>
+                            <th>Disk %</th>
+                            <th>Uptime</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stats-tbody">
+                        <tr>
+                            <td colspan="5" class="text-center">Loading statistics...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/device-details.js') }}?v=2"></script>
+{% endblock %}

@@ -4,25 +4,20 @@ An open-source, cross-platform device monitoring system built for enterprise env
 
 ![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow.svg)
+![Status](https://img.shields.io/badge/Status-Active-success.svg)
 
 ## 🌟 Features
 
-### Current Features (Agent)
-- ✅ **Power State Monitoring** - Track device startup, shutdown, sleep, and wake events
-- ✅ **System Statistics** - Monitor CPU, memory, and disk usage
-- ✅ **Local Database Storage** - SQLite database for offline data collection
+### Current Features
+- ✅ **Power State Monitoring** - Track device startup, shutdown, sleep, wake, and battery events
+- ✅ **System Statistics** - Monitor CPU, memory, and disk usage in real-time
+- ✅ **Centralized Dashboard** - Beautiful web interface to monitor all devices
+- ✅ **Local & Cloud Storage** - SQLite for local data, server database for centralized management
 - ✅ **Cross-Platform Support** - Works on Windows, Linux, and macOS
-- ✅ **Detailed Logging** - Comprehensive activity logs
-- ✅ **Background Service** - Runs silently in the background
-
-### Upcoming Features (Server & Dashboard)
-- 🔄 **Centralized Management** - Monitor multiple devices from one dashboard
-- 🔄 **Web Dashboard** - Beautiful, interactive web interface
-- 🔄 **Real-time Analytics** - Charts and graphs for usage patterns
-- 🔄 **Report Generation** - Automated usage reports
-- 🔄 **Alerts & Notifications** - Get notified of unusual activity
-- 🔄 **REST API** - Full API for data access and integration
+- ✅ **Real-time Analytics** - Interactive charts and graphs for usage patterns
+- ✅ **Report Generation** - Automated usage, uptime, events, and performance reports
+- ✅ **REST API** - Full API for data access and integration
+- ✅ **Multi-Device Management** - Monitor unlimited devices from one dashboard
 
 ## 🏗️ Architecture
 
@@ -31,11 +26,16 @@ device-monitor/
 ├── agent/              # Client-side monitoring agent
 │   ├── monitors/       # Power and system monitoring modules
 │   ├── database/       # Local SQLite database management
+│   ├── sync/           # Server synchronization
 │   ├── config/         # Configuration settings
 │   └── utils/          # Helper functions and logging
-├── server/            # Central management server (coming soon)
-├── scripts/           # Utility scripts
-└── docs/              # Documentation
+├── server/             # Central management server
+│   ├── api/            # REST API endpoints
+│   ├── models/         # Database models
+│   ├── dashboard/      # Web dashboard (HTML/CSS/JS)
+│   └── config/         # Server configuration
+├── scripts/            # Deployment and utility scripts
+└── docs/               # Documentation
 ```
 
 ## 🚀 Quick Start
@@ -48,7 +48,7 @@ device-monitor/
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/YOUR-USERNAME/device-monitor.git
+git clone https://github.com/affan1002/device-monitor.git
 cd device-monitor
 ```
 
@@ -69,63 +69,90 @@ cp .env.example .env
 # Edit .env with your settings
 ```
 
-5. **Run the agent**
+5. **Run the server**
+```bash
+python server/app.py
+```
+
+6. **Run the agent (in a new terminal)**
 ```bash
 python agent/main.py
 ```
 
+7. **Access the dashboard**
+```
+Open browser: http://localhost:5000
+```
+
 ## 📊 Usage
+
+### Running the Server
+
+Start the central monitoring server:
+```bash
+python server/app.py
+```
+
+Access the dashboard at: `http://localhost:5000`
+
+**Dashboard Features:**
+- 📈 Real-time device statistics
+- 🖥️ Device management interface
+- 📋 Comprehensive reports
+- ⚡ Power event tracking
 
 ### Running the Agent
 
-Start monitoring your device:
+Start monitoring a device:
 ```bash
 python agent/main.py
 ```
 
 The agent will:
+- Register with the server automatically
 - Log system startup event
-- Monitor power state changes
+- Monitor power state changes (startup, shutdown, sleep, wake, battery)
 - Collect system statistics every 5 minutes
-- Store data in local SQLite database
+- Sync data to server every 5 minutes
+- Store data locally in SQLite database
 
-### Viewing Collected Data
+### Viewing Reports
 
-View the database contents:
-```bash
-python scripts/view_database.py
-```
+1. Navigate to **Reports** page on the dashboard
+2. Select report type:
+   - Usage Summary
+   - Uptime Report
+   - Events Report
+   - Performance Report
+3. Choose date range
+4. Click "Generate Report"
 
-Generate a formatted report:
-```bash
-python scripts/view_report.py
-```
+### Stopping Services
 
-### Stopping the Agent
-
-Press `Ctrl+C` to gracefully shutdown the agent.
+Press `Ctrl+C` to gracefully shutdown the agent or server.
 
 ## 🗄️ Database Schema
 
+### Devices
+- Device ID, hostname, platform
+- Last seen, registration date
+- Active status
+
 ### Power Events
-- Event type (startup, shutdown, sleep, wake)
-- Timestamp
-- Event details
-- Sync status
+- Event type (STARTUP, SHUTDOWN, SLEEP, WAKE, BATTERY_*)
+- Timestamp, details
+- Device reference
 
 ### System Statistics
 - Timestamp
-- CPU usage percentage
-- Memory usage percentage
-- Disk usage percentage
+- CPU, memory, disk usage percentages
 - System uptime
-- Sync status
+- Device reference
 
 ### Session Events
 - Session type (login, logout)
-- Start/end time
-- Duration
-- Username
+- Start/end time, duration
+- Username, device reference
 
 ## 🛠️ Technology Stack
 
@@ -133,12 +160,39 @@ Press `Ctrl+C` to gracefully shutdown the agent.
 - Python 3.7+
 - psutil - System monitoring
 - SQLite - Local database
-- python-dotenv - Configuration management
+- requests - Server communication
+- pytz - Timezone handling
 
-**Server (Coming Soon):**
+**Server:**
 - Flask - Web framework
-- PostgreSQL/MySQL - Database
-- Docker - Containerization
+- Flask-SQLAlchemy - ORM
+- SQLite/PostgreSQL - Database
+- Chart.js - Data visualization
+- Bootstrap-inspired UI
+
+## 📱 Deployment
+
+### Deploy Agent on Multiple Computers
+
+See [Agent Deployment Guide](docs/AGENT_DEPLOYMENT.md) for detailed instructions.
+
+**Quick steps:**
+1. Copy agent files to target computer
+2. Configure `.env` with server IP and unique device ID
+3. Run setup script
+4. Start agent
+
+### Network Configuration
+
+**Local Network:**
+- Server and agents on same network
+- Use server's local IP address
+- Open port 5000 on firewall
+
+**Internet Deployment:**
+- Use public IP or domain name
+- Configure port forwarding
+- Consider HTTPS and authentication
 
 ## 📋 Roadmap
 
@@ -147,16 +201,21 @@ Press `Ctrl+C` to gracefully shutdown the agent.
   - [x] System statistics collection
   - [x] Local database storage
   - [x] Cross-platform support
-- [ ] Phase 2: Server & Dashboard
-  - [ ] REST API development
-  - [ ] Web dashboard interface
-  - [ ] Multi-device management
-  - [ ] Data visualization
+  - [x] Battery monitoring
+  - [x] Sleep/wake detection
+- [x] Phase 2: Server & Dashboard
+  - [x] REST API development
+  - [x] Web dashboard interface
+  - [x] Multi-device management
+  - [x] Data visualization
+  - [x] Report generation
 - [ ] Phase 3: Advanced Features
   - [ ] Real-time notifications
   - [ ] Advanced analytics
   - [ ] Mobile app
+  - [ ] User authentication
   - [ ] Cloud deployment
+  - [ ] Email alerts
 
 ## 🔐 Privacy & Ethics
 
@@ -165,10 +224,17 @@ This system is designed for legitimate IT management purposes. Please ensure:
 - ✅ Compliance with local privacy laws (GDPR, etc.)
 - ✅ Proper data retention policies
 - ✅ Secure data handling
+- ✅ Informed consent from monitored users
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📝 License
 
@@ -176,14 +242,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Your Name**
+**Affan**
 - Cybersecurity Student
-- GitHub: [@your-username](https://github.com/your-username)
+- GitHub: [@affan1002](https://github.com/affan1002)
+- Project: [Device Monitor System](https://github.com/affan1002/device-monitor)
 
 ## 📧 Contact
 
-For questions or support, please open an issue on GitHub.
+For questions or support, please open an issue on GitHub:
+- Issues: [https://github.com/affan1002/device-monitor/issues](https://github.com/affan1002/device-monitor/issues)
+
+## 🙏 Acknowledgments
+
+- Built as a cybersecurity learning project
+- Designed for educational and enterprise IT management purposes
+- Inspired by the need for transparent device monitoring solutions
 
 ---
 
-⭐ If you find this project useful, please consider giving it a star!
+⭐ If you find this project useful, please consider giving it a star on [GitHub](https://github.com/affan1002/device-monitor)!
+
+**Live Demo:** Run locally with `python server/app.py` and visit `http://localhost:5000`

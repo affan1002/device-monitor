@@ -1,26 +1,41 @@
-"""
+"""  
 Logging configuration for the Device Monitor Agent
 """
 
 import logging
 import sys
 from pathlib import Path
+from datetime import datetime
+import pytz
+
+# IST Timezone
+IST = pytz.timezone('Asia/Kolkata')
+
+class ISTFormatter(logging.Formatter):
+    """Custom formatter to use IST timezone"""
+    
+    def formatTime(self, record, datefmt=None):
+        # Convert to IST
+        dt = datetime.fromtimestamp(record.created, IST)
+        if datefmt:
+            return dt.strftime(datefmt)
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 def setup_logger(name='DeviceMonitor', log_file='agent.log', level=logging.INFO):
     """
-    Setup logger with both file and console handlers
+    Setup logger with both file and console handlers using IST timezone
     """
     # Create logger
     logger = logging.getLogger(name)
     logger.setLevel(level)
     
-    # Create formatters
-    detailed_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    # Create formatters with IST
+    detailed_formatter = ISTFormatter(
+        '%(asctime)s IST - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
-    simple_formatter = logging.Formatter(
+    simple_formatter = ISTFormatter(
         '%(levelname)s: %(message)s'
     )
     
