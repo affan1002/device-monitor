@@ -39,6 +39,14 @@ agent.log
 .env.local
 .env.*.local
 
+# Screenshots (sensitive data)
+screenshots/
+*.jpg
+*.jpeg
+*.png
+server/screenshots/
+agent/screenshots/
+
 # Testing
 .pytest_cache/
 .coverage

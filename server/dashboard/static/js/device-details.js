@@ -42,6 +42,9 @@ async function loadDeviceDetails() {
         // Load system stats history
         await loadStatsHistory();
         
+        // Load screenshots
+        await loadScreenshots();
+        
         // Initialize charts
         if (!cpuChart) {
             initCharts();
@@ -328,6 +331,56 @@ async function updateCharts() {
     } catch (error) {
         console.error('Error updating charts:', error);
     }
+}
+
+/**
+ * Load screenshots
+ */
+async function loadScreenshots() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/devices/${deviceId}/screenshots`);
+        const data = await response.json();
+        
+        const container = document.getElementById('screenshots-container');
+        
+        if (!data.screenshots || data.screenshots.length === 0) {
+            container.innerHTML = '<div class="empty-message">📸 No screenshots available yet. Screenshots are captured every 5 minutes.</div>';
+            return;
+        }
+        
+        // Build screenshot gallery
+        container.innerHTML = data.screenshots.map(screenshot => `
+            <div class="screenshot-card">
+                <div class="screenshot-image">
+                    <img src="/api/v1/screenshots/${screenshot.filename}" 
+                         alt="Screenshot" 
+                         onclick="viewFullScreenshot('${screenshot.filename}')">
+                </div>
+                <div class="screenshot-info">
+                    <div class="screenshot-time">
+                        <strong>🕒 Captured:</strong><br>
+                        ${formatDateTime(screenshot.timestamp)}
+                    </div>
+                    <div class="screenshot-size">
+                        <strong>💾 Size:</strong> ${screenshot.filesize.toFixed(1)} KB
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading screenshots:', error);
+        document.getElementById('screenshots-container').innerHTML = 
+            '<div class="error-message">❌ Failed to load screenshots</div>';
+    }
+}
+
+/**
+ * View screenshot in full size
+ */
+function viewFullScreenshot(filename) {
+    const url = `/api/v1/screenshots/${filename}`;
+    window.open(url, '_blank');
 }
 
 /**

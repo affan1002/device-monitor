@@ -2,9 +2,12 @@
 API routes for device monitoring server
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from datetime import datetime
-from server.models.database import db, Device, PowerEvent, SystemStat, SessionEvent
+from pathlib import Path
+import os
+from werkzeug.utils import secure_filename
+from server.models.database import db, Device, PowerEvent, SystemStat, SessionEvent, Screenshot
 from server.api.auth import require_api_key
 
 api = Blueprint('api', __name__, url_prefix='/api/v1')
@@ -209,5 +212,108 @@ def get_power_events(device_id):
             'events': [event.to_dict() for event in events],
             'total': len(events)
         }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/devices/<device_id>/screenshots', methods=['POST'])
+@require_api_key
+def upload_screenshot(device_id):
+    """Upload a screenshot from a device"""
+    try:
+        # Find device
+        device = Device.query.filter_by(device_id=device_id).first()
+        if not device:
+            return jsonify({'error': 'Device not found'}), 404
+        
+        # Check if file is present
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'Empty filename'}), 400
+        
+        # Secure the filename and save
+        filename = secure_filename(file.filename)
+        
+        # Create screenshots directory if not exists
+        screenshot_dir = Path(__file__).parent.parent / 'screenshots'
+        screenshot_dir.mkdir(exist_ok=True)
+        
+        # Save file
+        filepath = screenshot_dir / filename
+        file.save(str(filepath))
+        
+        # Get file size in KB
+        filesize = filepath.stat().st_size / 1024
+        
+        # Add to database
+        screenshot = Screenshot(
+            device_id=device.id,
+            filename=filename,
+            filesize=filesize,
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(screenshot)
+        
+        # Keep only 3 screenshots per device
+        screenshots = Screenshot.query.filter_by(device_id=device.id)\
+            .order_by(Screenshot.timestamp.desc())\
+            .all()
+        
+        if len(screenshots) > 3:
+            # Delete oldest screenshots
+            for old_screenshot in screenshots[3:]:
+                # Delete file
+                old_filepath = screenshot_dir / old_screenshot.filename
+                if old_filepath.exists():
+                    old_filepath.unlink()
+                # Delete from database
+                db.session.delete(old_screenshot)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Screenshot uploaded successfully',
+            'screenshot': screenshot.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/devices/<device_id>/screenshots', methods=['GET'])
+def get_screenshots(device_id):
+    """Get screenshots for a device"""
+    try:
+        device = Device.query.filter_by(device_id=device_id).first()
+        if not device:
+            return jsonify({'error': 'Device not found'}), 404
+        
+        # Get recent screenshots (max 3)
+        screenshots = Screenshot.query.filter_by(device_id=device.id)\
+            .order_by(Screenshot.timestamp.desc())\
+            .limit(3)\
+            .all()
+        
+        return jsonify({
+            'device_id': device_id,
+            'screenshots': [screenshot.to_dict() for screenshot in screenshots],
+            'total': len(screenshots)
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/screenshots/<filename>', methods=['GET'])
+def get_screenshot_file(filename):
+    """Serve a screenshot file"""
+    try:
+        screenshot_dir = Path(__file__).parent.parent / 'screenshots'
+        filepath = screenshot_dir / secure_filename(filename)
+        
+        if not filepath.exists():
+            return jsonify({'error': 'Screenshot not found'}), 404
+        
+        return send_file(str(filepath), mimetype='image/jpeg')
     except Exception as e:
         return jsonify({'error': str(e)}), 500

@@ -111,3 +111,25 @@ class SessionEvent(db.Model):
             'username': self.username,
             'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None
         }
+
+class Screenshot(db.Model):
+    """Screenshot model - stores device screenshots"""
+    __tablename__ = 'screenshots'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    filesize = db.Column(db.Float)  # in KB
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        """Convert screenshot to dictionary"""
+        return {
+            'id': self.id,
+            'device_id': self.device_id,
+            'filename': self.filename,
+            'filesize': self.filesize,
+            'timestamp': self.timestamp.isoformat() + 'Z' if self.timestamp else None,
+            'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None
+        }

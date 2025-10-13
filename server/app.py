@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from server.config.settings import config
-from server.models.database import db, Device, SystemStat, PowerEvent
+from server.models.database import db, Device, SystemStat, PowerEvent, Screenshot
 from server.api.routes import api
 
 def create_app():

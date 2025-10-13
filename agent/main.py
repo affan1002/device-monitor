@@ -16,6 +16,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from agent.config.settings import Settings
 from agent.monitors.power_monitor import PowerMonitor
 from agent.monitors.system_monitor import SystemMonitor
+from agent.monitors.screenshot_monitor import ScreenshotMonitor
 from agent.database.local_db import LocalDatabase
 from agent.utils.logger import setup_logger
 from agent.sync.server_sync import ServerSync
@@ -28,6 +29,7 @@ class DeviceMonitorAgent:
         self.db = LocalDatabase()
         self.power_monitor = PowerMonitor(self.db, self.logger)
         self.system_monitor = SystemMonitor(self.db, self.logger)
+        self.screenshot_monitor = ScreenshotMonitor(self.db, self.logger, interval=300, max_screenshots=3)
         self.server_sync = ServerSync(
             database=self.db,
             server_url=f"http://{self.settings.SERVER_HOST}:{self.settings.SERVER_PORT}",
@@ -52,6 +54,7 @@ class DeviceMonitorAgent:
             
             self.power_monitor.start()
             self.system_monitor.start()
+            self.screenshot_monitor.start()
             
             # Schedule sync every 5 minutes
             schedule.every(5).minutes.do(self.server_sync.sync_all)
@@ -75,6 +78,8 @@ class DeviceMonitorAgent:
             self.power_monitor.stop()
         if hasattr(self, 'system_monitor'):
             self.system_monitor.stop()
+        if hasattr(self, 'screenshot_monitor'):
+            self.screenshot_monitor.stop()
         
         self.logger.info("Agent stopped successfully")
     

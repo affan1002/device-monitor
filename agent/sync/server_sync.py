@@ -8,6 +8,7 @@ import logging
 from datetime import datetime
 import socket
 import platform
+from pathlib import Path
 
 class ServerSync:
     def __init__(self, database, server_url, api_key, device_id):
@@ -166,11 +167,52 @@ class ServerSync:
             # Sync system stats
             self.sync_system_stats()
             
+            # Sync screenshots
+            self.sync_screenshots()
+            
             self.logger.info("✅ Synchronization complete")
             return True
             
         except Exception as e:
             self.logger.error(f"Error during synchronization: {e}")
+            return False
+    
+    def sync_screenshots(self):
+        """Sync screenshots to server"""
+        try:
+            # Get unsynced screenshots
+            screenshots = self.db.get_screenshots()
+            
+            for screenshot in screenshots:
+                if screenshot.get('synced') == 0:
+                    # Read screenshot file
+                    filepath = screenshot['filepath']
+                    
+                    if not Path(filepath).exists():
+                        self.logger.warning(f"Screenshot file not found: {filepath}")
+                        continue
+                    
+                    url = f"{self.api_base_url}/devices/{self.device_id}/screenshots"
+                    
+                    headers = {
+                        'X-API-Key': self.api_key
+                    }
+                    
+                    # Upload file
+                    with open(filepath, 'rb') as f:
+                        files = {'file': (screenshot['filename'], f, 'image/jpeg')}
+                        response = requests.post(url, files=files, headers=headers, timeout=30)
+                    
+                    if response.status_code == 200:
+                        self.logger.info(f"📸 Synced screenshot: {screenshot['filename']}")
+                        # Note: We don't mark as synced because we manage screenshots locally
+                    else:
+                        self.logger.error(f"Failed to sync screenshot: {response.status_code}")
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error syncing screenshots: {e}")
             return False
     
     def test_connection(self):

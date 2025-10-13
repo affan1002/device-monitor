@@ -59,6 +59,18 @@ class LocalDatabase:
                 )
             ''')
             
+            # Create screenshots table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS screenshots (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    filename TEXT NOT NULL,
+                    filepath TEXT NOT NULL,
+                    filesize REAL,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    synced INTEGER DEFAULT 0
+                )
+            ''')
+            
             self.connection.commit()
             self.logger.info("Database initialized successfully")
             
@@ -163,6 +175,41 @@ class LocalDatabase:
         except sqlite3.Error as e:
             self.logger.error(f"Error retrieving recent stats: {e}")
             return []
+    
+    def log_screenshot(self, filename, filepath, filesize):
+        """Log a screenshot capture"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                INSERT INTO screenshots (filename, filepath, filesize, timestamp)
+                VALUES (?, ?, ?, ?)
+            ''', (filename, filepath, filesize, datetime.now()))
+            self.connection.commit()
+            return cursor.lastrowid
+        except sqlite3.Error as e:
+            self.logger.error(f"Error logging screenshot: {e}")
+            return None
+    
+    def get_screenshots(self):
+        """Get all screenshots"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('SELECT * FROM screenshots ORDER BY timestamp DESC')
+            return [dict(row) for row in cursor.fetchall()]
+        except sqlite3.Error as e:
+            self.logger.error(f"Error retrieving screenshots: {e}")
+            return []
+    
+    def delete_screenshot(self, screenshot_id):
+        """Delete a screenshot from database"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('DELETE FROM screenshots WHERE id = ?', (screenshot_id,))
+            self.connection.commit()
+            return True
+        except sqlite3.Error as e:
+            self.logger.error(f"Error deleting screenshot: {e}")
+            return False
     
     def close(self):
         """Close database connection"""
