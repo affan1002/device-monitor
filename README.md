@@ -262,4 +262,4 @@ For questions or support, please open an issue on GitHub:
 
 ⭐ If you find this project useful, please consider giving it a star on [GitHub](https://github.com/affan1002/device-monitor)!
 
-**Live Demo:** Run locally with `python server/app.py` and visit `http://localhost:5000`
+**Live Demo:** Run locally with `...........` and visit `......`
